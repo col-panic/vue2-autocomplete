@@ -8,13 +8,15 @@
       :class="`${getClassName('input')} autocomplete-input`"
       :placeholder="placeholder"
       :name="name"
-      v-model="type"
+      v-model="typeLabel"
       @input="handleInput"
       @dblclick="handleDoubleClick"
       @blur="handleBlur"
       @keydown="handleKeyDown"
       @focus="handleFocus"
       autocomplete="off"
+      :size="size"
+      v-shortkey.focus="['ctrl', 'p']"
     />
 
     <div
@@ -60,9 +62,11 @@
     props: {
       id: String,
       name: String,
+      size: Number,
       className: String,
       classes: {
         type: Object,
+        typeLabel: String,
         default: () => ({
           wrapper: false,
           input: false,
@@ -132,6 +136,9 @@
       // Create a custom template from data.
       onShouldRenderChild: Function,
 
+      // custom label for the field
+      onShouldUseCustomTypeLabel: Function,
+
       // Process the result before retrieveng the result array.
       process: Function,
 
@@ -152,6 +159,7 @@
       return {
         showList: false,
         type: "",
+        typeLabel: "",
         json: [],
         focusList: "",
         debounceTask: undefined,
@@ -186,6 +194,7 @@
       clearInput() {
         this.showList = false
         this.type = ""
+        this.typeLabel = ""
         this.json = []
         this.focusList = ""
       },
@@ -308,7 +317,8 @@
         // Deep clone of the original object
         const clean = this.cleanUp(data);
         // Put the selected data to type (model)
-        this.type = clean[this.anchor];
+        this.type = clean;
+        this.typeLabel = (this.onShouldUseCustomTypeLabel) ? this.onShouldUseCustomTypeLabel(clean) : clean[this.anchor];
         // Hide List
         this.showList = false;
         // Callback Event
@@ -403,3 +413,4 @@
 
   }
 </script>
+
